@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>시장 Pome Market(오늘 뭐 쓰지?)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Gowun+Batang:wght@700&family=Hahmlet:wght@300&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Hahmlet', serif;
+    }
+    /* 스타일링 */
+    .container {
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      font-size: 40px;
+      margin-bottom: 20px;
+      line-height: 1;
+    }
+    .title-line1 {
+      font-size: 48px;
+      font-weight: bold;
+    }
+    .title-line2 {
+      font-size: 25px;
+      font-weight: bold;
+    }
+    .box {
+      margin: 40px auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      width: 400px;
+      display: none;
+    }
+    button {
+      margin-top: 40px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #99CCFF;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      font-weight: bold;
+      color: #000080;
+    }
+    #prompt {
+      margin-top: 40px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+    #startButton {
+      margin: 30px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #FFD1DC;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      font-weight: bold;
+      color: #000080;
+      display: none;
+      text-align: center;
+    }
+    #startButton::before {
+      content: '\21BB';
+      margin-right: 5px;
+    }
+    #creator {
+      margin-top: 100px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px; /* 크기 수정 */
+    }
+    .label {
+      font-weight: bold;
+    }
+    .help-box {
+      margin-top: 50px;
+      background-color: #f2f2f2;
+      padding: 10px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><span class="title-line1">시장</span><br><span class="title-line2">Poem Market</span></h1>
+    <br>
+    <div class="help-box">
+      <p style="font-size: 20px; font-weight: bold;">- 오늘 뭐 쓰지? -</p>
+      <p id="helpText" style="margin-top: 10px;">도와줘 버튼을 눌러보세요.</p>
+    </div>
+    <div class="box" id="prompt">
+      <p><span class="label">추천소재:</span><br><span id="topic"></span></p>
+      <p><span class="label">추천질문:</span><br><span id="question"></span></p>
+    </div>
+    <button id="helpButton">도와줘</button>
+    <button id="startButton">처음으로</button>
+    <div id="creator">Created by: 교육뮤지컬 꿈꾸는 치수쌤<br><a href="https://songnae1.padlet.org/chichiboo/poem-market-no8vlh0tv49xryw2">[참여] 소재와 질문 추천하기</a></div>
+  </div>
+
+  <script>
+    // 시쓰기 소재와 질문 배열
+    var topics = [
+      "꽃", "비", "바다", "산", "별", "바람", "나무", "강", "햇빛", "구름",
+      "사랑", "희망", "추억", "꿈", "우정", "미래", "감사", "용기", "평화", "영웅", "아침 식사",
+      "학교", "숙제", "저녁 식사","친구와 놀이 시간", "도서관 방문", "공원에서 놀기",
+      "쇼핑하기", "운동", "수영", "반려동물", "요리하기", "청소", "침대에서 책 읽기", "영화",
+      "자전거 타기", "피크닉", "게임", "놀이", "방청소", "저녁 산책", "봄꽃",
+      "여름 바다 소리", "가을 단풍 구경", "겨울 눈 내리는 날", "하늘의 구름",
+      "나무의 잎사귀", "해변의 모래", "강물 소리", "동물의 발자국", "새의 지저귐",
+      "나무 그늘에서의 휴식", "하늘에 떠있는 기차 구경", "산의 정상", "동굴",
+      "해돋이 혹은 해지는 풍경", "별이 빛나는 밤", "바람에 날리는 잎사귀", "빗소리와 번개",
+      "소나무 숲 산책", "꽃과 나비", "숲", "사랑", "기쁨", "슬픔", "설렘", "불안", "용기",
+      "감사", "희망", "행복", "존경", "우정", "인내", "존중", "도움", "협력", "관용",
+      "정의", "자유", "성실", "헌신", "창의성", "인간미", "겸손", "책임감", "인연",
+      "스스로", "배려", "봉사", "공감", "자기계발", "그림 그리기", "음악", "춤추기",
+      "연극", "시쓰기", "조각", "사진기", "노래 부르기", "글쓰기", "연기",
+      "우주 여행", "시간 여행", "마법", "동화 속 이야기", "친구", "신비로운 섬",
+      "용과의 대결", "신화와 전설", "가상현실", "미래 도시", "숨겨진 보물 찾기",
+      "꿈꾸던 사람과의 만남", "우주인과의 대화", "동물과의 대화", "로봇", "시간",
+      "마법의 도서관", "초능력","마법 동물원", "판타지 세계", "뮤지컬", "인공지능"  
+      // ... 나머지 소재들
+    ];
+    var questions = [
+  "이 단어를 보고 떠오르는 이야기가 있나요?",
+  "이 단어를 보고 어떤 음악이 떠오르나요?",
+  "이 단어를 보고 무슨 냄새가 나는 것 같나요?",
+  "이 단어를 보고 어떤 맛이 떠오르나요?",
+  "이 단어를 보고 어떤 장면이 떠오르나요?",
+  "이 단어를 보고 어떤 소리가 들리나요?",
+  "이 단어를 보고 어떤 풍경이 그려지나요?",
+  "이 단어를 보고 어떤 감정이 느껴지나요?",
+  "이 단어를 보고 어떤 동작이 연상되나요?",
+  "이 단어를 보고 어떤 기억이 떠오르나요?",
+  "이 단어를 보고 어떤 모양이 그려지나요?",
+  "이 단어를 보고 어떤 날씨가 떠올라요?",
+  "이 단어를 보고 어떤 문장이 떠오르나요?",
+  "이 단어를 보고 어떤 재미있는 일이 생각나나요?",
+  "이 단어를 보고 어떤 꿈이 떠올라요?",
+  "이 단어를 보고 어떤 동물이 생각나나요?",
+  "이 단어를 보고 어떤 장소가 떠오르나요?",
+  "이 단어를 보고 어떤 노래가 떠오르나요?",
+  "이 단어를 보고 어떤 사람이 떠오르나요?",
+  "이 단어를 보고 어떤 향기가 느껴지나요?",
+  "이 단어를 보고 어떤 색깔이 떠올라요?",
+  "이 단어를 보고 어떤 자연 소리가 들리나요?",
+  "이 단어를 보고 어떤 감정이 느껴지나요?",
+  "이 단어를 보고 어떤 동작이 생각나나요?",
+  "이 단어를 보고 어떤 기억이 떠오르나요?",
+  "이 단어를 보고 어떤 사물이 떠올라요?",
+  "이 단어를 보고 어떤 장면이 그려지나요?",
+  "이 단어를 보고 어떤 맛이 떠오르나요?",
+  "이 단어를 보고 어떤 날씨가 떠올라요?",
+  "이 단어를 보고 어떤 감정이 느껴지나요?",
+  "이 단어는 당신과 어떤 관련이 있나요?"
+      // ... 나머지 질문들
+    ];
+
+    // 도와줘 버튼 클릭 이벤트 핸들러
+    document.getElementById("helpButton").addEventListener("click", function() {
+      // 문장 숨기기
+      document.getElementById("helpText").style.display = "none";
+
+      // 랜덤한 소재와 질문 가져오기
+      var randomTopic = getRandomElement(topics);
+      var randomQuestion = getRandomElement(questions);
+
+      // 소재와 질문 출력
+      var topicElement = document.getElementById("topic");
+      var questionElement = document.getElementById("question");
+      topicElement.textContent = randomTopic;
+      questionElement.textContent = randomQuestion;
+
+      // 박스와 버튼 보이기
+      document.getElementById("prompt").style.display = "block";
+      document.getElementById("startButton").style.display = "block";
+
+      // 버튼 상태 변경
+      document.getElementById("helpButton").textContent = "다시 도와줘";
+    });
+
+    // 다시 도와줘 버튼 클릭 이벤트 핸들러
+    document.getElementById("startButton").addEventListener("click", function() {
+      // 초기 화면으로 돌아가기
+      document.getElementById("prompt").style.display = "none";
+      document.getElementById("startButton").style.display = "none";
+      document.getElementById("helpText").style.display = "block";
+      document.getElementById("helpButton").textContent = "도와줘";
+    });
+
+    // 랜덤한 요소 반환 함수
+    function getRandomElement(array) {
+      var randomIndex = Math.floor(Math.random() * array.length);
+      return array[randomIndex];
+    }
+  </script>
+</body>
+</html>
